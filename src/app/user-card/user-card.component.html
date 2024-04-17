@@ -1,0 +1,100 @@
+<div class="bg-transparent min-h-screen text-white p-8" style="overflow-y: auto;">
+  <div class="max-w-4xl mx-auto">
+    <!-- User Details -->
+    <div class="bg-opacity-80 p-4 rounded-lg mb-8 border border-white border-opacity-20 shadow-md">
+      <img [src]="userData.avatar_url" alt="Avatar" class="rounded-full mx-auto max-h-60 max-w-60 shadow-blue mb-4">
+      <h2 class="text-white text-center text-xl font-bold"> {{ userData.login }}</h2>
+      <p class="text-gray-300 text-center">{{ userData.bio }} </p>
+      <div class="mt-4">
+        <!-- Website Link -->
+        <div *ngIf="userData.blog" class="mb-2">
+          <a [href]="userData.blog" target="_blank" class="text-blue-500 hover:text-blue-600 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M17 10.999A7 7 0 115 10a7 7 0 0112 0zM8.293 6.293a1 1 0 10-1.414 1.414L9.586 11l-2.707 2.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414l-3-3z" clip-rule="evenodd" />
+            </svg>
+          Blog Profile
+          </a>
+        </div>
+        <!-- GitHub Profile Link -->
+        <div>
+          <a [href]="'https://github.com/' + userData.login" target="_blank" class="text-blue-500 hover:text-blue-600 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 2a8 8 0 00-7.938 7.14L0 11l2.062 2.86A8 8 0 0010 18v-2a6 6 0 110-12v-2zm0 4a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd" />
+            </svg>
+            GitHub Profile
+          </a>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- Page Size Dropdown -->
+    <div class="flex items-center mb-4">
+      <label for="pageSize" class="mr-2">Fetch Request For Repositories:</label>
+      <select id="pageSize" [(ngModel)]="pageSize" (ngModelChange)="changePageSize()" class="rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-gray-900">
+        <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+      </select>
+    </div>
+
+    <!-- Number of Repositories Dropdown -->
+    <div class="flex items-center mb-4 ">
+      <label for="repoCount" class="mr-2">Repositories per Page:</label>
+      <select id="repoCount" [(ngModel)]="repoCount" (change)="changeRepoCounts()" class="rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-gray-900">
+        <option *ngFor="let size of repoCounts" [value]="size">{{ size }}</option>
+      </select>
+    
+
+<div *ngIf="loading" class="text-center mb-4">
+      <div class="spinner-border text-light" role="status">
+        <span class="sr-only"><app-loading-skeleton></app-loading-skeleton></span>
+      </div>
+    </div>
+</div>
+    <!-- Repositories -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngFor="let repo of displayedRepos" class="bg-transparent border border-white border-opacity-10 p-6 rounded-lg mb-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xl font-semibold text-white mb-2">{{ repo.name }}</h4>
+          <a [href]="repo.html_url" target="_blank" class="text-blue-500 hover:text-blue-600">
+            <p class="underline">View</p>
+          </a>
+        </div>
+        <p class="text-gray-400 mb-4">{{ repo.description }}</p>
+        <div *ngIf="repo.languages && repo.languages.length > 0">
+          <div class="flex flex-wrap mb-2">
+            <span *ngFor="let language of repo.languages" class="mr-2 mb-2 py-1 px-2 rounded-full text-sm text-white" [ngStyle]="{ 'background': getRandomColor(language) }">{{ language }}</span>
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <span class="text-gray-500 text-sm mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 12a2 2 0 114 0 2 2 0 01-4 0z" />
+            </svg>
+            {{ repo.stargazers_count }}
+          </span>
+          <span class="text-gray-500 text-sm mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v8c0 1.1.9 2 2 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm8 10a6 6 0 11-12 0 6 6 0 0112 0zM8 7a1 1 0 00-1 1v1a1 1 0 002 0V8a1 1 0 00-1-1zm2 4a1 1 0 100 2H8a1 1 0 100-2h2z" clip-rule="evenodd" />
+            </svg>
+            {{ repo.forks_count }}
+          </span>
+          <span class="text-gray-500 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 2a8 8 0 00-7.938 7.14L0 11l2.062 2.86A8 8 0 0010 18v-2a6 6 0 110-12v-2zm0 4a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd" />
+            </svg>
+            {{ repo.watchers_count }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8" *ngIf="!loading && userRepos.length > 0">
+      <button class="bg-gradient-to-r from-blue-500 to-blue-700 hover:bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-2 px-4 rounded-l" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+      <div class="flex items-center justify-center  bg-opacity-80 text-white py-2 px-4 border-none">
+        Page {{ currentPage }} of {{ totalPages }}
+      </div>
+      <button class="bg-gradient-to-r from-blue-500 to-blue-700 hover:bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-2 px-4 rounded-r" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </div>
+  </div>
+</div>
